@@ -6,9 +6,17 @@ logger = logging.getLogger(__name__)
 
 def rename(files, numonly=False, match=None):
     logger.info('リネームを開始します')
-    files = [[os.path.abspath(i), int(re.search(r'.+?-([0-9]+?)\.txt', os.path.basename(i)).group(1))] for i in files]
     if match:
-        files = [i for i in files if re.search(match, os.path.basename(i[0]))]
+        logger.debug('以下のパスは正規表現フィルターによって除外されます')
+        filteredFiles = []
+        for file in files:
+            if re.search(match, file):
+                filteredFiles.append(file)
+            else:
+                logger.debug('{}'.format(file))
+        files = filteredFiles
+        
+    files = [[os.path.abspath(i), int(re.search(r'.+?-([0-9]+?)\.txt', os.path.basename(i)).group(1))] for i in files]
     no_length = len(str(max(files, key=lambda i:i[1])[1]))
 
     logger.info('リネーム中 : {} ファイル'.format(len(files)))
